@@ -6,7 +6,6 @@ public:
 	ExampleLayer()
 		:Layer("Example Layer")
 	{
-
 	}
 	void OnUpdate() override 
 	{
