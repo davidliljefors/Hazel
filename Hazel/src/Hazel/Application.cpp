@@ -1,7 +1,6 @@
 #include "hzpch.h"
 #include "Application.h"
 
-
 #include "Hazel/Log.h"
 
 #include <glad/glad.h>
@@ -18,30 +17,27 @@ namespace Hazel {
 	{
 		HZ_CORE_ASSERT(!s_Instance, "Application already exists!");
 		s_Instance = this;
+
 		m_Window = std::unique_ptr<Window>(Window::Create());
 		m_Window->SetEventCallback(BIND_EVENT_FN(OnEvent));
+
+		m_ImGuiLayer = new ImGuiLayer();
+		m_ImGuiLayer->OnAttach();
+		PushOverlay(m_ImGuiLayer);
 	}
 
 	Application::~Application()
 	{
-
 	}
 
-	void Application::Run()
+	void Application::PushLayer(Layer* layer)
 	{
-		while (m_Running)
-		{
-			glClearColor(0.33, 0.33, 0.33, 1);
-			glClear(GL_COLOR_BUFFER_BIT);
+		m_LayerStack.PushLayer(layer);
+	}
 
-			for (Layer* layer : m_LayerStack)
-			{ layer->OnUpdate(); }
-
-			auto[x,y] = Input::GetMousePosition();
-			HZ_CORE_TRACE("{0},{1}", x,y);
-
-			m_Window->OnUpdate();
-		}
+	void Application::PushOverlay(Layer* layer)
+	{
+		m_LayerStack.PushOverlay(layer);
 	}
 
 	void Application::OnEvent(Event& e)
@@ -53,20 +49,29 @@ namespace Hazel {
 		{
 			(*--it)->OnEvent(e);
 			if (e.Handled)
-			{ break; }
+				break;
 		}
 	}
 
-	void Application::PushLayer(Layer* layer)
+	void Application::Run()
 	{
-		m_LayerStack.PushLayer(layer);
-		layer->OnAttach();
-	}
+		while (m_Running)
+		{
+			glClearColor(1, 0, 1, 1);
+			glClear(GL_COLOR_BUFFER_BIT);
 
-	void Application::PushOverlay(Layer* layer)
-	{
-		m_LayerStack.PushOverlay(layer);
-		layer->OnAttach();
+			for (Layer* layer : m_LayerStack)
+				layer->OnUpdate();
+
+			m_ImGuiLayer->Begin();
+			for (Layer* layer : m_LayerStack)
+			{
+				layer->OnImGuiRender();
+			}
+			m_ImGuiLayer->End();
+
+			m_Window->OnUpdate();
+		}
 	}
 
 	bool Application::OnWindowClose(WindowCloseEvent& e)
