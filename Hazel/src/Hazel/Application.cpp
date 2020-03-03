@@ -3,7 +3,7 @@
 
 #include "Hazel/Log.h"
 
-#include <glad/glad.h>
+#include "Hazel/Renderer/Renderer.h"
 
 #include "Input.h"
 
@@ -24,7 +24,6 @@ namespace Hazel {
 		m_Window->SetEventCallback(BIND_EVENT_FN(OnEvent));
 
 		m_ImGuiLayer = new ImGuiLayer();
-		m_ImGuiLayer->OnAttach();
 		PushOverlay(m_ImGuiLayer);
 
 		m_VertexArray.reset(VertexArray::Create());
@@ -64,7 +63,7 @@ namespace Hazel {
 		squareVB.reset(VertexBuffer::Create(squareVertices, sizeof(squareVertices)));
 		squareVB->SetLayout({
 			{ ShaderDataType::Float3, "a_Position" }
-		});
+			});
 		m_SquareVA->AddVertexBuffer(squareVB);
 
 		uint32_t squareIndices[6] = { 0,1,2,2,3,0 };
@@ -169,17 +168,20 @@ namespace Hazel {
 	{
 		while (m_Running)
 		{
-			glClearColor(0.1f, 0.1f, 0.1f, 1);
-			glClear(GL_COLOR_BUFFER_BIT);
+			RenderCommand::SetClearColor({ 0.1f, 0.1f, 0.1f, 1 });
+			RenderCommand::Clear();
 
-			m_Shader2->Bind();
-			m_SquareVA->Bind();
-			glDrawElements(GL_TRIANGLES, m_SquareVA->GetIndexBuffer()->GetCount(), GL_UNSIGNED_INT, nullptr);
+			{
+				Renderer::BeginScene();
 
+				m_Shader2->Bind();
+				Renderer::Submit(m_SquareVA);
 
-			m_Shader->Bind();
-			m_VertexArray->Bind();
-			glDrawElements(GL_TRIANGLES, m_VertexArray->GetIndexBuffer()->GetCount(), GL_UNSIGNED_INT, nullptr);
+				m_Shader->Bind();
+				Renderer::Submit(m_VertexArray);
+
+				Renderer::EndScene();
+			}
 
 			for (Layer* layer : m_LayerStack)
 				layer->OnUpdate();
