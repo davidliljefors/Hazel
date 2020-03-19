@@ -1,6 +1,9 @@
 #include <Hazel.h>
 
 #include "imgui/imgui.h"
+#include <glm/gtx/string_cast.hpp>
+
+glm::mat4 model(1.f);
 
 class ExampleLayer : public Hazel::Layer
 {
@@ -53,6 +56,7 @@ public:
 		squareIB.reset(Hazel::IndexBuffer::Create(squareIndices, sizeof(squareIndices) / sizeof(uint32_t)));
 		m_SquareVA->SetIndexBuffer(squareIB);
 
+#pragma region Shader
 		//------------------------------
 
 		std::string vertexSrc = R"(
@@ -62,6 +66,7 @@ public:
 			layout(location = 1) in vec4 a_Color;
 
 			uniform mat4 u_ViewProjection;
+			uniform mat4 u_ModelView;
 
 			out vec3 v_Position;
 			out vec4 v_Color;
@@ -70,7 +75,7 @@ public:
 			{
 				v_Position = a_Position+1;
 				v_Color = a_Color;
-				gl_Position = u_ViewProjection * vec4(a_Position, 1.0); 
+				gl_Position = u_ModelView * u_ViewProjection * vec4(a_Position, 1.0); 
 			}		
 		)";
 
@@ -117,29 +122,41 @@ public:
 				color = vec4(v_Position*v_Position, 1.0); 
 			}
 		)";
-
+#pragma endregion Shader
 
 		m_Shader = std::make_unique<Hazel::Shader>(vertexSrc, fragmentSrc);
+
 		m_Shader2 = std::make_unique<Hazel::Shader>(vertexSrc2, fragmentSrc2);
 	}
 
-	void OnUpdate() override
+	void OnUpdate(Hazel::Timestep ts) override
 	{
+		HZ_TRACE("Delta time : {0}ms", ts.GetMilliseconds());
+		if (Hazel::Input::IsKeyPressed(HZ_KEY_D))
+		{ model[0][3] += 1.0f * ts; };
+		if (Hazel::Input::IsKeyPressed(HZ_KEY_A))
+		{ model[0][3] -= 1.0f * ts; };
+
+
+		if (Hazel::Input::IsKeyPressed(HZ_KEY_W))
+		{ model[1][3] += 1.0f * ts; };
+		if (Hazel::Input::IsKeyPressed(HZ_KEY_S))
+		{ model[1][3] -= 1.0f * ts; };
+
 		if (Hazel::Input::IsKeyPressed(HZ_KEY_LEFT))
-		{ m_CameraPosition.x -= m_CameraMoveSpeed; }
-		else if (Hazel::Input::IsKeyPressed(HZ_KEY_RIGHT))
-		{ m_CameraPosition.x += m_CameraMoveSpeed; }
+		{ m_CameraPosition.x -= m_CameraMoveSpeed * ts; };
+		if (Hazel::Input::IsKeyPressed(HZ_KEY_RIGHT))
+		{ m_CameraPosition.x += m_CameraMoveSpeed * ts; };
 
 		if (Hazel::Input::IsKeyPressed(HZ_KEY_UP))
-		{ m_CameraPosition.y += m_CameraMoveSpeed; }
-		else if (Hazel::Input::IsKeyPressed(HZ_KEY_DOWN))
-		{ m_CameraPosition.y -= m_CameraMoveSpeed; }
+		{ m_CameraPosition.y += m_CameraMoveSpeed * ts; };
+		if (Hazel::Input::IsKeyPressed(HZ_KEY_DOWN))
+		{ m_CameraPosition.y -= m_CameraMoveSpeed * ts; };
 
-		if (Hazel::Input::IsKeyPressed(HZ_KEY_A))
-		{ m_CameraRotation += m_CameraRotationSpeed; }
-		else if (Hazel::Input::IsKeyPressed(HZ_KEY_D))
-		{ m_CameraRotation -= m_CameraRotationSpeed; }
 
+
+
+		m_Shader->UploadUniformMat4("u_ModelView", glm::transpose(model));
 
 		Hazel::RenderCommand::SetClearColor({ 0.1f, 0.1f, 0.1f, 1 });
 		Hazel::RenderCommand::Clear();
@@ -175,7 +192,7 @@ private:
 	glm::vec3 m_CameraPosition;
 	float m_CameraRotation = 0.0f;
 	float m_CameraRotationSpeed = 1.0f;
-	float m_CameraMoveSpeed = 0.1f;
+	float m_CameraMoveSpeed = 1.0f;
 };
 
 class Sandbox : public Hazel::Application
