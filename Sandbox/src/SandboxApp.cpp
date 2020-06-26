@@ -99,98 +99,27 @@ public:
 			}
 		)";
 
-		std::string flatColorVertexSrc = R"(
-			#version 330 core
-			
-			layout(location = 0) in vec3 a_Position;
+		
 
-			uniform mat4 u_ViewProjection;
-			uniform mat4 u_Transform;
-
-			out vec3 v_Position;
-
-			void main()
-			{
-				v_Position = a_Position+1;
-				gl_Position = u_ViewProjection * u_Transform * vec4(a_Position, 1.0); 
-			}		
-		)";
-
-		std::string flatColorFragmentSrc = R"(
-			#version 330 core
-			
-			layout(location = 0) out vec4 color;
-
-			in vec3 v_Position;
-
-			uniform vec3 u_Color;
-
-			void main()
-			{
-				color = vec4(u_Color, 1.0); 
-			}
-		)";
-
-		std::string textureVertexSrc = R"(
-			#version 330 core
-			
-			layout(location = 0) in vec3 a_Position;
-			layout(location = 1) in vec2 a_TexCoord;
-
-			uniform mat4 u_ViewProjection;
-			uniform mat4 u_Transform;
-
-			out vec2 v_TexCoord;
-
-			void main()
-			{
-				v_TexCoord = a_TexCoord;
-				gl_Position = u_ViewProjection * u_Transform * vec4(a_Position, 1.0); 
-			}		
-		)";
-
-		std::string textureFragmentSrc = R"(
-			#version 330 core
-			
-			layout(location = 0) out vec4 color;
-
-			in vec2 v_TexCoord;
-
-			uniform sampler2D u_Texture;
-
-			void main()
-			{
-				color = texture(u_Texture, v_TexCoord); 
-			}
-		)";
 
 #pragma endregion Shader
 
-		m_Shader = Hazel::Shader::Create(vertexSrc, fragmentSrc);
-		m_FlatColorShader = Hazel::Shader::Create(flatColorVertexSrc, flatColorFragmentSrc);
-		m_TextureShader = Hazel::Shader::Create(textureVertexSrc, textureFragmentSrc);
+		m_Shader = Hazel::Shader::Create("Shader1", vertexSrc, fragmentSrc);
+		auto colorShader = m_ShaderLibrary.Load("assets/shaders/FlatColor.glsl");
+		auto texShader = m_ShaderLibrary.Load("assets/shaders/Texture.glsl");
 
 		m_Texture = Hazel::Texture2D::Create("assets/Checkerboard.png");
 		m_HazelLogoTexture = Hazel::Texture2D::Create("assets/HazelLogo.png");
 
-		std::dynamic_pointer_cast<Hazel::OpenGLShader>(m_TextureShader)->Bind();
-		std::dynamic_pointer_cast<Hazel::OpenGLShader>(m_TextureShader)->UploadUniformInt("u_Texture", 0);
+		std::dynamic_pointer_cast<Hazel::OpenGLShader>(texShader)->Bind();
+		std::dynamic_pointer_cast<Hazel::OpenGLShader>(texShader)->UploadUniformInt("u_Texture", 0);
 	}
 
 
 
 	void OnUpdate(Hazel::Timestep ts) override
 	{
-		static int framecount = 0;		
-
-		if (Hazel::Input::IsKeyPressed(HZ_KEY_KP_ADD))
-		{
-			m_Camera.SetZoom(1.01f);
-		}
-		if (Hazel::Input::IsKeyPressed(HZ_KEY_KP_SUBTRACT))
-		{
-			m_Camera.SetZoom(0.99f);
-		}
+		static int framecount = 0;
 
 		if (framecount++ % 1000 == 0)
 		{
@@ -219,8 +148,10 @@ public:
 
 		static glm::mat4 scale = glm::scale(glm::mat4(1.0f), glm::vec3(0.1f));
 
-		std::dynamic_pointer_cast<Hazel::OpenGLShader>(m_FlatColorShader)->Bind();
-		std::dynamic_pointer_cast<Hazel::OpenGLShader>(m_FlatColorShader)->UploadUniformFloat3("u_Color", m_SquareColor);
+		auto colorShader = m_ShaderLibrary.Get("FlatColor");
+
+		std::static_pointer_cast<Hazel::OpenGLShader>(colorShader)->Bind();
+		std::static_pointer_cast<Hazel::OpenGLShader>(colorShader)->UploadUniformFloat3("u_Color", m_SquareColor);
 
 		{
 			Hazel::Renderer::BeginScene(m_Camera);
@@ -231,16 +162,17 @@ public:
 					{
 						glm::vec3 pos(i * 0.11f, j * 0.11f, 0.0f);
 						glm::mat4 transform = glm::translate(glm::mat4(1.0f), pos) * scale;
-						Hazel::Renderer::Submit(m_FlatColorShader, m_SquareVA, transform);
+						Hazel::Renderer::Submit(colorShader, m_SquareVA, transform);
 
 					}
 				}
 
+			auto texShader = m_ShaderLibrary.Get("Texture");
 			m_Texture->Bind(0);
-			Hazel::Renderer::Submit(m_TextureShader, m_SquareVA, glm::scale(glm::mat4(1.0f), glm::vec3(1.5f)));
+			Hazel::Renderer::Submit(texShader, m_SquareVA, glm::scale(glm::mat4(1.0f), glm::vec3(1.5f)));
 
 			m_HazelLogoTexture->Bind(0);
-			Hazel::Renderer::Submit(m_TextureShader, m_SquareVA, glm::scale(glm::mat4(1.0f), glm::vec3(1.5f)));
+			Hazel::Renderer::Submit(texShader, m_SquareVA, glm::scale(glm::mat4(1.0f), glm::vec3(1.5f)));
 
 			// Triangle
 			// Hazel::Renderer::Submit(m_Shader, m_VertexArray);
@@ -257,24 +189,32 @@ public:
 
 	void OnEvent(Hazel::Event& event) override
 	{
+		if (event.IsInCategory(Hazel::EventCategoryMouse))
+		{
+			if (event.GetEventType() == Hazel::EventType::MouseScrolled)
+			{
+				auto scrollevent = static_cast<Hazel::MouseScrolledEvent&>(event);
+				auto offset = scrollevent.GetYOffset();
+				m_Camera.SetZoom(1.0f + 0.1f * offset);
+			}
+		}
 	}
 
 private:
+	Hazel::ShaderLibrary m_ShaderLibrary;
 	Hazel::Ref<Hazel::Shader> m_Shader;
 	Hazel::Ref<Hazel::VertexArray> m_VertexArray;
 
-	Hazel::Ref<Hazel::Shader> m_FlatColorShader;
-	Hazel::Ref<Hazel::Shader> m_TextureShader;
 	Hazel::Ref<Hazel::VertexArray> m_SquareVA;
 	Hazel::Ref<Hazel::Texture2D> m_Texture;
 	Hazel::Ref<Hazel::Texture2D> m_HazelLogoTexture;
 
 	Hazel::OrthographicCamera m_Camera;
 	glm::vec3 m_CameraPosition;
-	float m_CameraRotation = 0.0f;
-	float m_CameraRotationSpeed = 50.0f;
-	float m_CameraMoveSpeed = 1.0f;
-	glm::vec3 m_SquareColor = { 0.2f, 0.8f, 0.3f };
+	float m_CameraRotation { 0.0f };
+	float m_CameraRotationSpeed { 50.0f };
+	float m_CameraMoveSpeed { 1.0f };
+	glm::vec3 m_SquareColor { 0.2f, 0.8f, 0.3f };
 };
 
 class Sandbox : public Hazel::Application
