@@ -30,11 +30,11 @@ namespace Hazel {
 
 	struct BufferElement
 	{
-		std::string Name;
-		ShaderDataType Type;
-		uint32_t Size;
-		uint32_t Offset;
-		bool Normalized;
+		std::string Name {};
+		ShaderDataType Type {};
+		uint32_t Size { 0 };
+		uint32_t Offset { 0 };
+		bool Normalized = false;
 
 		BufferElement() {}
 		BufferElement(ShaderDataType type, const std::string& name, bool normalized = false)

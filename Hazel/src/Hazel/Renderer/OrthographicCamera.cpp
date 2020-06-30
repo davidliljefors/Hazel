@@ -10,11 +10,13 @@ namespace Hazel {
 	{
 		m_ViewProjectionMatrix = m_ProjectionMatrix * m_ViewMatrix;
 	}
-	void OrthographicCamera::SetZoom(float zoom)
+	
+	void OrthographicCamera::SetProjection(float left, float right, float bottom, float top)
 	{
-		 m_ProjectionMatrix = glm::scale(m_ProjectionMatrix, glm::vec3(zoom, zoom, 0.0f)); 
-		 RecalculateViewMatrix(); 
+		m_ProjectionMatrix = glm::ortho(left, right, bottom, top, -1.0f, 1.0f);
+		m_ViewProjectionMatrix = m_ProjectionMatrix * m_ViewMatrix;
 	}
+
 	void OrthographicCamera::RecalculateViewMatrix()
 	{
 		glm::mat4 transform = glm::translate(glm::mat4(1.0f), m_Position) * 

@@ -1,5 +1,6 @@
 #include <Hazel.h>
-#include <future>
+#include <Hazel/Core/EntryPoint.h>
+
 #include "Platform/OpenGL/OpenGLShader.h"
 #include "Platform/OpenGL/OpenGLTexture.h"
 
@@ -7,13 +8,13 @@
 #include <glm/gtx/string_cast.hpp>
 #include <glm/gtc/type_ptr.hpp>
 
-
+#include "Sandbox2D.h"
 
 class ExampleLayer : public Hazel::Layer
 {
 public:
 	ExampleLayer()
-		: Layer("Example"), m_Camera(-3.2f, 3.2f, -1.8f, 1.8f), m_CameraPosition(0.0f)
+		: Layer("Example"), m_CameraController(1280.f / 720.f, true)
 	{
 		m_VertexArray = Hazel::VertexArray::Create();
 
@@ -120,31 +121,17 @@ public:
 	void OnUpdate(Hazel::Timestep ts) override
 	{
 		static int framecount = 0;
+		// Update
+		m_CameraController.OnUpdate(ts);
 
+		// Render
 		if (framecount++ % 1000 == 0)
 		{
 			HZ_TRACE("Delta time : {0} FPS", (1.f / ts.GetSeconds()));
 		}
 
-		if (Hazel::Input::IsKeyPressed(HZ_KEY_A))
-			m_CameraPosition.x -= m_CameraMoveSpeed * ts;
-		else if (Hazel::Input::IsKeyPressed(HZ_KEY_D))
-			m_CameraPosition.x += m_CameraMoveSpeed * ts;
-
-		if (Hazel::Input::IsKeyPressed(HZ_KEY_W))
-			m_CameraPosition.y += m_CameraMoveSpeed * ts;
-		else if (Hazel::Input::IsKeyPressed(HZ_KEY_S))
-			m_CameraPosition.y -= m_CameraMoveSpeed * ts;
-
-		if (Hazel::Input::IsKeyPressed(HZ_KEY_Q))
-			m_CameraRotation += m_CameraRotationSpeed * ts;
-		else if (Hazel::Input::IsKeyPressed(HZ_KEY_E))
-			m_CameraRotation -= m_CameraRotationSpeed * ts;
-
 		Hazel::RenderCommand::SetClearColor({ 0.1f, 0.1f, 0.1f, 1 });
 		Hazel::RenderCommand::Clear();
-		m_Camera.SetPosition(m_CameraPosition);
-		m_Camera.SetRotation(m_CameraRotation);
 
 		static glm::mat4 scale = glm::scale(glm::mat4(1.0f), glm::vec3(0.1f));
 
@@ -154,7 +141,7 @@ public:
 		std::static_pointer_cast<Hazel::OpenGLShader>(colorShader)->UploadUniformFloat3("u_Color", m_SquareColor);
 
 		{
-			Hazel::Renderer::BeginScene(m_Camera);
+			Hazel::Renderer::BeginScene(m_CameraController.GetCamera());
 
 			for (size_t i = 0; i < 15; i++)
 				for (size_t j = 0; j < 15; j++)
@@ -187,16 +174,15 @@ public:
 		ImGui::End();
 	}
 
-	void OnEvent(Hazel::Event& event) override
+	void OnEvent(Hazel::Event& e) override
 	{
-		if (event.IsInCategory(Hazel::EventCategoryMouse))
+		m_CameraController.OnEvent(e);
+
+		if (e.GetEventType() == Hazel::EventType::WindowResize)
 		{
-			if (event.GetEventType() == Hazel::EventType::MouseScrolled)
-			{
-				auto scrollevent = static_cast<Hazel::MouseScrolledEvent&>(event);
-				auto offset = scrollevent.GetYOffset();
-				m_Camera.SetZoom(1.0f + 0.1f * offset);
-			}
+			auto& re = static_cast<Hazel::WindowResizeEvent&>(e);
+			float zoom = re.GetWidth() / 1280.f;
+			m_CameraController.SetZoomLevel(zoom);
 		}
 	}
 
@@ -209,11 +195,8 @@ private:
 	Hazel::Ref<Hazel::Texture2D> m_Texture;
 	Hazel::Ref<Hazel::Texture2D> m_HazelLogoTexture;
 
-	Hazel::OrthographicCamera m_Camera;
-	glm::vec3 m_CameraPosition;
-	float m_CameraRotation { 0.0f };
-	float m_CameraRotationSpeed { 50.0f };
-	float m_CameraMoveSpeed { 1.0f };
+	Hazel::OrthographicCameraController m_CameraController;
+
 	glm::vec3 m_SquareColor { 0.2f, 0.8f, 0.3f };
 };
 
@@ -222,7 +205,8 @@ class Sandbox : public Hazel::Application
 public:
 	Sandbox()
 	{
-		PushLayer(new ExampleLayer());
+		//PushLayer(new ExampleLayer());
+		PushLayer(new Sandbox2D());
 	}
 
 	~Sandbox()

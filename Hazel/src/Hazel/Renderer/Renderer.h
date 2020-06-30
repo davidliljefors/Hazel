@@ -11,6 +11,8 @@ namespace Hazel {
 	{
 	public:
 		static void Init();
+		static void OnWindowResize(uint32_t width, uint32_t height);
+
 		static void BeginScene(OrthographicCamera& camera); // Todo scene paramanters;
 		static void EndScene();
 
@@ -23,7 +25,7 @@ namespace Hazel {
 			glm::mat4 ViewProjectionMatrix;
 		};
 
-		static SceneData* m_SceneData;
+		static Scope<SceneData> m_SceneData;
 	};
 
 }
