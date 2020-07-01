@@ -2,7 +2,6 @@
 #include <Hazel/Core/EntryPoint.h>
 
 #include "Platform/OpenGL/OpenGLShader.h"
-#include "Platform/OpenGL/OpenGLTexture.h"
 
 #include "imgui/imgui.h"
 #include <glm/gtx/string_cast.hpp>

@@ -1,7 +1,4 @@
 #include "Sandbox2D.h"
-
-#include "Platform/OpenGL/OpenGLTexture.h"
-
 #include "imgui/imgui.h"
 #include <glm/gtc/type_ptr.hpp>
 
@@ -16,7 +13,7 @@ Sandbox2D::Sandbox2D()
 
 void Sandbox2D::OnAttach()
 {
-	
+	m_Texture = Hazel::Texture2D::Create("assets/Checkerboard.png");
 }
 
 void Sandbox2D::OnDetach()
@@ -43,6 +40,7 @@ void Sandbox2D::OnUpdate(Hazel::Timestep ts)
 
 	Hazel::Renderer2D::DrawQuad({ 0.0f, 0.0f }, { 1.0f, 1.0f }, m_SquareColor);
 	Hazel::Renderer2D::DrawQuad({ -1.0f, 0.0f }, { 0.8f, 0.8 }, {0.9f, 0.1f, 0.15f, 1.0f});
+	Hazel::Renderer2D::DrawQuad({ 0.0f, 0.5f }, { 0.4f, 0.4 }, m_Texture);
 	Hazel::Renderer2D::EndScene();
 
 }
