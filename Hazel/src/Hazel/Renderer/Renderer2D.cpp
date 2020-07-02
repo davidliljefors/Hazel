@@ -43,8 +43,9 @@ namespace Hazel
 		squareIB = IndexBuffer::Create(squareIndices, sizeof(squareIndices) / sizeof(uint32_t));
 		s_Data->QuadVA->SetIndexBuffer(squareIB);
 
+		// Create white default texture for rendering plain colours
 		s_Data->WhiteTexture = Texture2D::Create(1, 1);
-		uint32_t whiteTextureData = 0xffffff;
+		uint32_t whiteTextureData = 0xffffffff;
 		s_Data->WhiteTexture->SetData(&whiteTextureData, sizeof(uint32_t));
 
 		s_Data->TextureShader = Shader::Create("assets/shaders/Texture.glsl");
@@ -54,8 +55,10 @@ namespace Hazel
 
 	void Renderer2D::Shutdown()
 	{
-		if(s_Data)
+		if (s_Data)
+		{
 			delete s_Data;
+		}
 	}
 
 	void Renderer2D::BeginScene(const OrthographicCamera& camera)
