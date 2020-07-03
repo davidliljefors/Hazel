@@ -5,7 +5,6 @@
 #include <chrono>
 #include<sstream>
 
-using namespace std::chrono;
 template <typename Fn>
 class Timer
 {
@@ -13,27 +12,25 @@ public:
 	Timer(std::string&& name, Fn&& func)
 		: m_Name(name), m_Func(func)
 	{
-		m_StartTime = high_resolution_clock::now();
+		m_StartTime = std::chrono::steady_clock::now();
 	}
 	~Timer()
 	{
-		auto endTime = high_resolution_clock::now();
-		auto start = time_point_cast<microseconds>(m_StartTime).time_since_epoch().count();
-		auto end = time_point_cast<microseconds>(endTime).time_since_epoch().count();
-		auto duration = (end - start) * 0.001;
-		m_Func({ m_Name, duration });
+		auto endTime = std::chrono::steady_clock::now();
+		double duration_microseconds = static_cast<double>(std::chrono::duration_cast<std::chrono::microseconds>(endTime - m_StartTime).count());
+		m_Func({ m_Name, duration_microseconds / 1000.0 });
 	}
 private:
 	Timer();
 	std::string m_Name;
 	Fn m_Func;
-	time_point<steady_clock> m_StartTime;
+	std::chrono::steady_clock::time_point m_StartTime;
 };
 
 auto rotation = 1.0f;
 
 Sandbox2D::Sandbox2D()
-	: Layer("Sandbox2D"), m_CameraController(1280.f /720.f)
+	: Layer("Sandbox2D"), m_CameraController(1280.f / 720.f)
 {
 
 }
@@ -67,7 +64,7 @@ void Sandbox2D::OnUpdate(Hazel::Timestep ts)
 	Hazel::Renderer2D::BeginScene(m_CameraController.GetCamera());
 
 	Hazel::Renderer2D::DrawQuad({ 0.0f, 0.0f }, { 1.0f, 1.0f }, m_SquareColor);
-	Hazel::Renderer2D::DrawQuad({ -1.0f, 0.0f }, { 0.8f, 0.8 }, {0.9f, 0.1f, 0.15f, 1.0f});
+	Hazel::Renderer2D::DrawQuad({ -1.0f, 0.0f }, { 0.8f, 0.8 }, { 0.9f, 0.1f, 0.15f, 1.0f });
 	Hazel::Renderer2D::DrawQuad({ 0.0f, 0.5f }, { 0.4f, 0.4 }, m_Texture);
 	Hazel::Renderer2D::EndScene();
 

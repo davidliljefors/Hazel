@@ -11,6 +11,9 @@
 #include <GLFW/glfw3.h>
 #include <glad/glad.h>
 
+// TODO fetch dpi scaling factor from user
+static auto constexpr dpiScalingFactor = 2.0f;
+
 namespace Hazel {
 
 	ImGuiLayer::ImGuiLayer()
@@ -43,8 +46,10 @@ namespace Hazel {
 		ImGuiStyle& style = ImGui::GetStyle();
 		if (io.ConfigFlags & ImGuiConfigFlags_ViewportsEnable)
 		{
-			style.WindowRounding = 0.0f;
+			style.WindowRounding = 4.0f;
 			style.Colors[ImGuiCol_WindowBg].w = 1.0f;
+			style.ScaleAllSizes(2.0f);
+			io.Fonts->AddFontFromFileTTF("C:/dev/Hazel/Hazel/fonts/Verdana.ttf", 18.0f * dpiScalingFactor, NULL, NULL);
 		}
 
 		Application& app = Application::Get();
@@ -53,6 +58,7 @@ namespace Hazel {
 		// Setup Platform/Renderer bindings
 		ImGui_ImplGlfw_InitForOpenGL(window, true);
 		ImGui_ImplOpenGL3_Init("#version 410");
+		
 	}
 
 	void ImGuiLayer::OnDetach()
