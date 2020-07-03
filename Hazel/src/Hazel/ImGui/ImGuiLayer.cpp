@@ -46,7 +46,7 @@ namespace Hazel {
 		ImGuiStyle& style = ImGui::GetStyle();
 		if (io.ConfigFlags & ImGuiConfigFlags_ViewportsEnable)
 		{
-			style.WindowRounding = 4.0f;
+			style.WindowRounding = 4.0f * dpiScalingFactor;
 			style.Colors[ImGuiCol_WindowBg].w = 1.0f;
 			style.ScaleAllSizes(2.0f);
 			io.Fonts->AddFontFromFileTTF("C:/dev/Hazel/Hazel/fonts/Verdana.ttf", 18.0f * dpiScalingFactor, NULL, NULL);
@@ -96,8 +96,6 @@ namespace Hazel {
 
 	void ImGuiLayer::OnImGuiRender()
 	{
-		static bool show = true;
-		ImGui::ShowDemoWindow(&show);
 	}
 
 }

@@ -23,11 +23,4 @@ private:
 	Hazel::Ref<Hazel::Texture2D> m_Texture;
 
 	glm::vec4 m_SquareColor { 0.2f, 0.8f, 0.3f, 1.f };
-
-	struct ProfileResult
-	{
-		std::string Name;
-		double Time;
-	};
-	std::vector <ProfileResult> m_ProfileResults {};
 };
