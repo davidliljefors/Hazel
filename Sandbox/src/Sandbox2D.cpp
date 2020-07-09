@@ -2,7 +2,6 @@
 #include "imgui/imgui.h"
 #include <glm/gtc/type_ptr.hpp>
 
-#include <chrono>
 #include<sstream>
 
 auto rotation = 1.0f;
@@ -15,18 +14,18 @@ Sandbox2D::Sandbox2D()
 
 void Sandbox2D::OnAttach()
 {
+	HZ_PROFILE_FUNCTION();
 	m_Texture = Hazel::Texture2D::Create("assets/Checkerboard.png");
 }
 
 void Sandbox2D::OnDetach()
 {
-
 }
 
 void Sandbox2D::OnUpdate(Hazel::Timestep ts)
 {
 	static int framecount = 0;
-	HZ_PROFILE_SCOPE("OnUpdate");
+	HZ_PROFILE_FUNCTION();
 	// Update
 	m_CameraController.OnUpdate(ts);
 
@@ -36,16 +35,20 @@ void Sandbox2D::OnUpdate(Hazel::Timestep ts)
 		HZ_TRACE("Delta time : {0} FPS", (1.f / ts.GetSeconds()));
 	}
 
-	Hazel::RenderCommand::SetClearColor({ 0.1f, 0.1f, 0.1f, 1 });
-	Hazel::RenderCommand::Clear();
+	{
+		HZ_PROFILE_SCOPE("Sandbox::Render Prep");
+		Hazel::RenderCommand::SetClearColor({ 0.1f, 0.1f, 0.1f, 1 });
+		Hazel::RenderCommand::Clear();
+		Hazel::Renderer2D::BeginScene(m_CameraController.GetCamera());
+	}
 
-	Hazel::Renderer2D::BeginScene(m_CameraController.GetCamera());
-
-	Hazel::Renderer2D::DrawQuad({ 0.0f, 0.0f }, { 1.0f, 1.0f }, m_SquareColor);
-	Hazel::Renderer2D::DrawQuad({ -1.0f, 0.0f }, { 0.8f, 0.8 }, { 0.9f, 0.1f, 0.15f, 1.0f });
-	Hazel::Renderer2D::DrawQuad({ 0.0f, 0.5f }, { 0.4f, 0.4 }, m_Texture);
+	{
+		HZ_PROFILE_SCOPE("Sandobx::Render Draw");
+		Hazel::Renderer2D::DrawQuad({ 0.0f, 0.0f }, { 1.0f, 1.0f }, m_SquareColor);
+		Hazel::Renderer2D::DrawQuad({ -1.0f, 0.0f }, { 0.8f, 0.8 }, { 0.9f, 0.1f, 0.15f, 1.0f });
+		Hazel::Renderer2D::DrawQuad({ 0.0f, 0.5f }, { 0.4f, 0.4 }, m_Texture);
+	}
 	Hazel::Renderer2D::EndScene();
-
 }
 
 void Sandbox2D::OnImGuiRender()

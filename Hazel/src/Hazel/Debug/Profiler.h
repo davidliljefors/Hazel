@@ -14,7 +14,7 @@ namespace Hazel {
     {
         std::string Name;
         long long Start, End;
-        uint32_t ThreadID;
+        size_t ThreadID;
     };
 
     struct ProfileSession
@@ -112,7 +112,7 @@ namespace Hazel {
             long long start = std::chrono::time_point_cast<std::chrono::microseconds>(m_StartTimepoint).time_since_epoch().count();
             long long end = std::chrono::time_point_cast<std::chrono::microseconds>(endTimepoint).time_since_epoch().count();
 
-            uint32_t threadID = std::hash<std::thread::id> {}(std::this_thread::get_id());
+            auto threadID = std::hash<std::thread::id> {}(std::this_thread::get_id());
             Profiler::Get().WriteProfile({ m_Name, start, end, threadID });
 
             m_Stopped = true;
@@ -129,7 +129,7 @@ namespace Hazel {
 #define HZ_PROFILE_BEGIN_SESSION(name, filepath) ::Hazel::Profiler::Get().BeginSession(name, filepath)
 #define HZ_PROFILE_END_SESSION() ::Hazel::Profiler::Get().EndSession()
 #define HZ_PROFILE_SCOPE(name) ::Hazel::ProfileTimer timer##__LINE__(name)
-#define HZ_PROFILE_FUNCTION() HZ_PROFILE_SCOPE(__FUNCSIC__)
+#define HZ_PROFILE_FUNCTION() HZ_PROFILE_SCOPE(__FUNCSIG__)
 #else
 #define HZ_PROFILE_BEGIN_SESSION(name, filepath)
 #define HZ_PROFILE_END_SESSION()

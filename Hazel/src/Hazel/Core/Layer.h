@@ -28,6 +28,5 @@ namespace Hazel
 	protected:
 		std::string m_DebugName;
 	};
-
 }
 
