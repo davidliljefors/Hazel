@@ -46,7 +46,7 @@ void Sandbox2D::OnUpdate(Hazel::Timestep ts)
 		HZ_PROFILE_SCOPE("Sandobx::Render Draw");
 		Hazel::Renderer2D::DrawQuad({ 0.0f, 0.0f }, { 1.0f, 1.0f }, m_SquareColor);
 		Hazel::Renderer2D::DrawQuad({ -1.0f, 0.0f }, { 0.8f, 0.8 }, { 0.9f, 0.1f, 0.15f, 1.0f });
-		Hazel::Renderer2D::DrawQuad({ 0.0f, 0.5f }, { 0.4f, 0.4 }, m_Texture);
+		Hazel::Renderer2D::DrawQuad({ -5.0f, -5.0f }, { 10.f, 10.f }, m_Texture, 10.f);
 	}
 	Hazel::Renderer2D::EndScene();
 }
