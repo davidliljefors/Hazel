@@ -16,6 +16,7 @@ void Sandbox2D::OnAttach()
 	HZ_PROFILE_FUNCTION();
 
 	m_CheckerTexture = Hazel::Texture2D::Create("assets/Checkerboard.png");
+	m_SpriteSheet = Hazel::Texture2D::Create("assets/game/rpg_spritesheet.png");
 	logo = Hazel::Texture2D::Create("assets/HazelLogo.png");
 }
 
@@ -50,8 +51,9 @@ void Sandbox2D::OnUpdate(Hazel::Timestep ts)
 		Hazel::Renderer2D::DrawQuad({ -1.0f, 0.0f }, { 0.8f, 0.8 }, { 0.9f, 0.1f, 0.15f, 1.0f });
 		Hazel::Renderer2D::DrawQuad({ 0.0f, 0.0f , -0.1f }, { 20.0f, 20.0f }, m_CheckerTexture, 10.f);
 
-		Hazel::Renderer2D::DrawRotatedQuad({ -5.0f, 0.0f }, { 1.f, 1.f }, 45.f, m_CheckerTexture, 5.f);
-		Hazel::Renderer2D::DrawRotatedQuad({ 2.0f, 3.0f }, { 4.f, 1.f }, 25.f, m_SquareColor);
+		Hazel::Renderer2D::DrawQuad(m_SpritePos, m_SpriteSize, m_SpriteSheet);
+
+
 
 		static float rot = 0;
 		rot += 50.f * ts;
@@ -62,7 +64,6 @@ void Sandbox2D::OnUpdate(Hazel::Timestep ts)
 
 
 	Hazel::Renderer2D::BeginScene(m_CameraController.GetCamera());
-
 	for (float y = -5.f; y < 5.0f; y += 0.5f)
 	{
 		for (float x = -5.f; x < 5.0f; x += 0.5f)
@@ -71,8 +72,6 @@ void Sandbox2D::OnUpdate(Hazel::Timestep ts)
 			Hazel::Renderer2D::DrawQuad({ x, y }, glm::vec2(0.45f), col);
 		}
 	}
-
-
 	Hazel::Renderer2D::EndScene();
 }
 
@@ -81,12 +80,14 @@ void Sandbox2D::OnImGuiRender()
 	ImGui::Begin("Settings");
 
 	auto stats = Hazel::Renderer2D::GetStats();
+	ImGui::DragFloat3("Pos", glm::value_ptr(m_SpritePos), 0.01f);
+	ImGui::DragFloat2("Size", glm::value_ptr(m_SpriteSize), 0.01f);
+
 	ImGui::Text("Renderer2D stats : ");
 	ImGui::Text("Draw calls : %d", stats.DrawCalls);
 	ImGui::Text("Quads : %d", stats.QuadCount);
 	ImGui::Text("Vertices : %d", stats.GetVertexCount());
 	ImGui::Text("Indices : %d", stats.GetIndexCount());
-
 	ImGui::ColorEdit4("Square Color", glm::value_ptr(m_SquareColor));
 	ImGui::End();
 }
