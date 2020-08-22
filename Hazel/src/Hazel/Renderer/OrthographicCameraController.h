@@ -17,6 +17,7 @@ namespace Hazel {
 		const OrthographicCamera& GetCamera() const { return m_Camera; }
 		void SetZoomLevel(float zoom) { m_ZoomLevel = zoom; }
 		float GetZoomLevel() const { return m_ZoomLevel; }
+		glm::vec3 GetMouseWorldPosition(glm::vec2 mousepos) { return m_Camera.GetMouseWorldPosition(mousepos); }
 
 		void OnUpdate(Timestep ts);
 		void OnEvent(Event& e);

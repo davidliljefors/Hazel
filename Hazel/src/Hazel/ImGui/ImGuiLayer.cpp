@@ -12,7 +12,7 @@
 #include <glad/glad.h>
 
 // TODO fetch dpi scaling factor from user
-static auto constexpr dpiScalingFactor = 2.0f;
+static auto constexpr dpiScalingFactor = 1.0f;
 
 namespace Hazel {
 
@@ -49,7 +49,7 @@ namespace Hazel {
 		{
 			style.WindowRounding = 4.0f * dpiScalingFactor;
 			style.Colors[ImGuiCol_WindowBg].w = 1.0f;
-			style.ScaleAllSizes(2.0f);
+			style.ScaleAllSizes(dpiScalingFactor);
 			io.Fonts->AddFontFromFileTTF("C:/dev/Hazel/Hazel/fonts/Verdana.ttf", 18.0f * dpiScalingFactor, NULL, NULL);
 		}
 

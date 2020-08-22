@@ -26,5 +26,14 @@
     <ClInclude Include="src\Sandbox2D.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="src\ImageTools.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Sprite.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\LuaUtils.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

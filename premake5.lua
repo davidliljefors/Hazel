@@ -18,6 +18,7 @@ IncludeDir["Glad"] = "Hazel/vendor/Glad/include"
 IncludeDir["ImGui"] = "Hazel/vendor/imgui"
 IncludeDir["glm"] = "Hazel/vendor/glm"
 IncludeDir["stb_image"] = "Hazel/vendor/stb_image"
+IncludeDir["lua"] = "Sandbox/vendor/lua/include"
 
 include "Hazel/vendor/GLFW"
 include "Hazel/vendor/Glad"
@@ -116,12 +117,18 @@ project "Sandbox"
 		"Hazel/vendor/spdlog/include",
 		"Hazel/src",
 		"Hazel/vendor",
-		"%{IncludeDir.glm}"
+		"%{IncludeDir.glm}",
+		"%{IncludeDir.lua}"
+	}
+	libdirs 
+	{ 
+		"Sandbox/vendor/lua/libs"
 	}
 
 	links
 	{
-		"Hazel"
+		"Hazel",
+		"lua54.lib"
 	}
 
 	filter "system:windows"
