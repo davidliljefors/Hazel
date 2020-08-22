@@ -48,8 +48,7 @@ namespace LuaUtils
 		(Push(L, args), ...);
 	}
 
-
-	template<typename... ReturnTypes, typename... Args>
+	template<typename... Args>
 	int Call(lua_State* L,  char* funcName, Args&&... args)
 	{
 		lua_getglobal(L, funcName);

@@ -83,7 +83,7 @@
       <DebugInformationFormat>EditAndContinue</DebugInformationFormat>
       <Optimization>Disabled</Optimization>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
-      <LanguageStandard>stdcpp17</LanguageStandard>
+      <LanguageStandard>stdcpplatest</LanguageStandard>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -137,10 +137,13 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="src\game\Collider.h" />
+    <ClInclude Include="src\game\NativeLuaFunctions.h" />
+    <ClInclude Include="src\game\Thing.h" />
     <ClInclude Include="src\ImageTools.h" />
     <ClInclude Include="src\LuaUtils.h" />
     <ClInclude Include="src\Sandbox2D.h" />
-    <ClInclude Include="src\Sprite.h" />
+    <ClInclude Include="src\game\Sprite.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Sandbox2D.cpp" />

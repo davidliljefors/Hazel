@@ -29,10 +29,19 @@
     <ClInclude Include="src\ImageTools.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\Sprite.h">
+    <ClInclude Include="src\LuaUtils.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\game\Sprite.h">
       <Filter>Source Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\LuaUtils.h">
+    <ClInclude Include="src\game\Collider.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\game\Thing.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\game\NativeLuaFunctions.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

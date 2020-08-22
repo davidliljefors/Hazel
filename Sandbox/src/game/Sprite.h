@@ -3,7 +3,7 @@
 
 #include <glm\glm.hpp>
 
-class Sprite
+struct Sprite
 {
 public:
 	Sprite() = default;
@@ -13,7 +13,6 @@ public:
 		this->y = y;
 		this->texture = texture;
 	}
-
 
 	inline void Draw() const
 	{
@@ -36,5 +35,5 @@ public:
 	float y;
 private:
 	glm::vec2 size { 1.0f, 1.0f };
-	Hazel::Ref<Hazel::Texture2D> texture;
+	Hazel::Ref<Hazel::Texture2D> texture = nullptr;
 };
