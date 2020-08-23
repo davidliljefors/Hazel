@@ -1,13 +1,31 @@
 #include <Hazel.h>
 #include <Hazel/Core/EntryPoint.h>
 
-#include "Platform/OpenGL/OpenGLShader.h"
-
 #include "imgui/imgui.h"
-#include <glm/gtx/string_cast.hpp>
 #include <glm/gtc/type_ptr.hpp>
 
 #include "Sandbox2D.h"
+
+class Sandbox : public Hazel::Application
+{
+public:
+	Sandbox()
+	{
+		PushLayer(new Sandbox2D());
+	}
+
+	~Sandbox()
+	{
+	}
+
+};
+
+Hazel::Application* Hazel::CreateApplication()
+{
+	return new Sandbox();
+}
+
+
 
 //class ExampleLayer : public Hazel::Layer
 //{
@@ -198,25 +216,3 @@
 //
 //	glm::vec3 m_SquareColor { 0.2f, 0.8f, 0.3f };
 //};
-
-class LuaGame : public Hazel::Application
-{
-public:
-	LuaGame()
-	{
-		//PushLayer(new ExampleLayer());
-		PushLayer(new LuaLayer());
-	}
-
-	~LuaGame()
-	{
-	}
-
-};
-
-Hazel::Application* Hazel::CreateApplication()
-{
-	return new LuaGame();
-}
-
-

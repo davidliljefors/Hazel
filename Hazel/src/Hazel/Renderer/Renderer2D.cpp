@@ -124,7 +124,7 @@ namespace Hazel
 	{
 		HZ_PROFILE_FUNCTION();
 
-		uint32_t dataSize = static_cast<uint32_t> ( (uint8_t*)s_Data.QuadVertexBufferPtr - (uint8_t*)s_Data.QuadVertexBufferBase );
+		uint32_t dataSize = static_cast<uint32_t> ((uint8_t*)s_Data.QuadVertexBufferPtr - (uint8_t*)s_Data.QuadVertexBufferBase);
 		s_Data.QuadVertexBuffer->SetData(s_Data.QuadVertexBufferBase, dataSize);
 
 		Flush();
@@ -195,14 +195,25 @@ namespace Hazel
 	{
 		HZ_PROFILE_FUNCTION();
 
-		if (s_Data.QuadIndexCount >= Renderer2DData::MaxIndices)
-		{
-			StartNewBatch();
-		}
+		if (s_Data.QuadIndexCount >= Renderer2DData::MaxIndices) { StartNewBatch(); }
+
+		constexpr float x = 2.f;
+		constexpr float y = 3.f;
+		constexpr float sheetWidth = 2560.f;
+		constexpr float sheetHeight = 1664.f;
+		constexpr float spriteWidth = 128.f;
+		constexpr float spriteHeight = 128.f;
+
 
 		constexpr uint32_t quadVertexCount = 4;
 		constexpr glm::vec4 color = { 1.0f, 1.0f, 1.0f, 1.0f };
-		constexpr glm::vec2 textureCoords[] = { { 0.0f, 0.0f }, { 1.0f, 0.0f }, { 1.0f, 1.0f }, { 0.0f, 1.0f } };
+		constexpr glm::vec2 textureCoords[] = {
+			{ x * spriteWidth / sheetWidth  , y * spriteHeight / sheetHeight },
+			{ (x + 1) * spriteWidth / sheetWidth, y * spriteHeight / sheetHeight },
+			{ (x + 1) * spriteWidth / sheetWidth, (y + 1) * spriteHeight / sheetHeight },
+			{ x * spriteWidth / sheetWidth    , (y + 1) * spriteHeight / sheetHeight },
+
+		};
 
 		float textureIndex = 0.0f;
 
@@ -217,6 +228,8 @@ namespace Hazel
 
 		if (textureIndex == 0.0f)
 		{
+			if (s_Data.TextureSlotIndex >= Renderer2DData::MaxTextureSlots) { Flush(); }
+
 			textureIndex = static_cast<float>(s_Data.TextureSlotIndex);
 			s_Data.TextureSlots[s_Data.TextureSlotIndex] = texture;
 			s_Data.TextureSlotIndex++;
