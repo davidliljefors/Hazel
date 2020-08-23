@@ -104,7 +104,7 @@
       <MinimalRebuild>false</MinimalRebuild>
       <StringPooling>true</StringPooling>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
-      <LanguageStandard>stdcpp17</LanguageStandard>
+      <LanguageStandard>stdcpplatest</LanguageStandard>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -126,7 +126,7 @@
       <MinimalRebuild>false</MinimalRebuild>
       <StringPooling>true</StringPooling>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
-      <LanguageStandard>stdcpp17</LanguageStandard>
+      <LanguageStandard>stdcpplatest</LanguageStandard>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -137,13 +137,13 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClInclude Include="src\game\Collider.h" />
-    <ClInclude Include="src\game\NativeLuaFunctions.h" />
-    <ClInclude Include="src\game\Thing.h" />
     <ClInclude Include="src\ImageTools.h" />
     <ClInclude Include="src\LuaUtils.h" />
     <ClInclude Include="src\Sandbox2D.h" />
+    <ClInclude Include="src\game\Collider.h" />
+    <ClInclude Include="src\game\NativeLuaFunctions.h" />
     <ClInclude Include="src\game\Sprite.h" />
+    <ClInclude Include="src\game\Thing.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Sandbox2D.cpp" />
