@@ -1,156 +1,98 @@
 #include "Sandbox2D.h"
-
-#include <imgui/imgui.h>
+#include "imgui/imgui.h"
 #include <glm/gtc/type_ptr.hpp>
 
-#include <iostream>
-#include <sstream>
+#include<sstream>
 
-#include "LuaUtils.h"
-#include "game/Sprite.h"
-#include "ImageTools.h"
+Hazel::Ref<Hazel::Texture2D> logo;
 
-#include "game/NativeLuaFunctions.h"
-
-char luaInputBuffer[256];
-
-lua_State* Sandbox2D::luaInstance = luaL_newstate();
-Hazel::Ref<Hazel::Texture2D> zero1 = nullptr;
-Hazel::Ref<Hazel::Texture2D> zero2 = nullptr;
-
-Sandbox2D::Sandbox2D()
+LuaLayer::LuaLayer()
 	: Layer("Sandbox2D"), m_CameraController(1280.f / 720.f)
 {
-	m_Things.reserve(256);
-	luaL_openlibs(luaInstance);
-	lua_pushlightuserdata(luaInstance, this);
-	lua_setglobal(luaInstance, "game");
-	lua_register(luaInstance, "destroyThing", wrap_DestroyThing);
-	lua_register(luaInstance, "createThing", wrap_CreateThing);
-	LuaUtils::CheckError(luaInstance, luaL_dofile(luaInstance, "behaviour.lua"));
-
-	zero1 = Hazel::Texture2D::Create("zerotwo.png");
-	zero2 = Hazel::Texture2D::Create("zerothree.png");
-
-	m_Things.emplace_back(zero1);
-	m_Things.emplace_back(zero1);
-	m_Things.emplace_back(zero1);
-	m_Things.emplace_back(zero1);
-	m_Things.emplace_back(zero1);
-	m_ControlledThing = std::make_unique<Thing>(zero2);
 }
 
-void Sandbox2D::OnAttach()
+void LuaLayer::OnAttach()
 {
 	HZ_PROFILE_FUNCTION();
+
+	m_CheckerTexture = Hazel::Texture2D::Create("assets/Checkerboard.png");
+	m_SpriteSheet = Hazel::Texture2D::Create("assets/game/rpg_spritesheet.png");
+	logo = Hazel::Texture2D::Create("assets/HazelLogo.png");
 }
 
-void Sandbox2D::OnDetach()
+void LuaLayer::OnDetach()
 {
-
 }
 
-bool bPrssedLastFrame = false;
-float movespeed = 14.f;
-
-void Sandbox2D::OnUpdate(Hazel::Timestep ts)
+void LuaLayer::OnUpdate(Hazel::Timestep ts)
 {
+	static int framecount = 0;
+	HZ_PROFILE_FUNCTION();
 	// Update
 	m_CameraController.OnUpdate(ts);
 
-	if (m_ControlledThing)
-	{
-		if (Hazel::Input::IsKeyPressed(HZ_KEY_LEFT))
-		{
-			m_ControlledThing->Move({ -movespeed * ts, 0 });
-		}
-		if (Hazel::Input::IsKeyPressed(HZ_KEY_RIGHT))
-		{
-			m_ControlledThing->Move({ movespeed * ts, 0 });
-		}
-		if (Hazel::Input::IsKeyPressed(HZ_KEY_UP))
-		{
-			m_ControlledThing->Move({ 0, movespeed * ts });
-		}
-		if (Hazel::Input::IsKeyPressed(HZ_KEY_DOWN))
-		{
-			m_ControlledThing->Move({0, -movespeed * ts});
-		}
-	}
-
-	for (auto& t : m_Things)
-	{
-		if (m_ControlledThing)
-		{
-			if (m_ControlledThing->Intersects(&t))
-			{
-				m_ControlledThing->OnCollision(&t);
-			}
-		}
-	}
-
-	if (Hazel::Input::IsMouseButtonPressed(0) && !bPrssedLastFrame)
-	{
-		bPrssedLastFrame = true;
-		auto mousepos = Hazel::Input::GetMousePosition();
-		auto mouseworld = m_CameraController.GetMouseWorldPosition({ mousepos.first, mousepos.second });
-
-	}
-	
-	if (!Hazel::Input::IsMouseButtonPressed(0) && bPrssedLastFrame)
-	{
-		bPrssedLastFrame = false;
-	}
-
 	// Render
 	Hazel::Renderer2D::ResetStats();
-	Hazel::RenderCommand::SetClearColor({ 0.1f, 0.1f, 0.1f, 1 });
-	Hazel::RenderCommand::Clear();
-	Hazel::Renderer2D::BeginScene(m_CameraController.GetCamera());
+	if (framecount++ % 1000 == 0)
+	{
+		HZ_TRACE("Delta time : {0} FPS", (1.f / ts.GetSeconds()));
+	}
 
 	{
-		HZ_PROFILE_SCOPE("Render loop");
-		for (const auto& thing : m_Things)
-		{
-			thing.Render();
-		}
+		HZ_PROFILE_SCOPE("Sandbox::Render Prep");
+		Hazel::RenderCommand::SetClearColor({ 0.1f, 0.1f, 0.1f, 1 });
+		Hazel::RenderCommand::Clear();
+		Hazel::Renderer2D::BeginScene(m_CameraController.GetCamera());
+	}
+
+	{
+		HZ_PROFILE_SCOPE("Sandobx::Render Draw");
+		Hazel::Renderer2D::DrawQuad({ 0.0f, 0.0f }, { 1.0f, 1.0f }, m_SquareColor);
+		Hazel::Renderer2D::DrawQuad({ -1.0f, 0.0f }, { 0.8f, 0.8 }, { 0.9f, 0.1f, 0.15f, 1.0f });
+		Hazel::Renderer2D::DrawQuad({ 0.0f, 0.0f , -0.1f }, { 20.0f, 20.0f }, m_CheckerTexture, 10.f);
+
+		Hazel::Renderer2D::DrawQuad(m_SpritePos, m_SpriteSize, m_SpriteSheet);
+
+
+
+		static float rot = 0;
+		rot += 50.f * ts;
+		Hazel::Renderer2D::DrawRotatedQuad({ -2.0f, -2.0f }, { 3.f, 3.f }, rot, logo);
 
 	}
-	if (m_ControlledThing) m_ControlledThing->Render();
 	Hazel::Renderer2D::EndScene();
 
-	std::erase_if(m_Things, [](const Thing& thing)
-	{
-		return thing.IsDead();
-	});
 
-	for (auto& t : m_ThingsToAdd)
+	Hazel::Renderer2D::BeginScene(m_CameraController.GetCamera());
+	for (float y = -5.f; y < 5.0f; y += 0.5f)
 	{
-		m_Things.push_back(std::move(t));
+		for (float x = -5.f; x < 5.0f; x += 0.5f)
+		{
+			glm::vec4 col = { (x + 5.f) / 10.f, (y + 5.f) / 10.f, 0.6f, 0.7f };
+			Hazel::Renderer2D::DrawQuad({ x, y }, glm::vec2(0.45f), col);
+		}
 	}
-
-	m_ThingsToAdd.clear();
+	Hazel::Renderer2D::EndScene();
 }
 
-Thing* Sandbox2D::CreateThing(const char* textureName)
+void LuaLayer::OnImGuiRender()
 {
-	auto thing = &m_ThingsToAdd.emplace_back(zero1);
-	return thing;
-}
+	ImGui::Begin("Settings");
 
-void Sandbox2D::OnImGuiRender()
-{
-	ImGui::Begin("Lua interpreter");
-	ImGui::Text("Enter lua code:");
-	if (ImGui::InputText("", luaInputBuffer, 256, ImGuiInputTextFlags_EnterReturnsTrue))
-	{
-		LuaUtils::CheckError(luaInstance, luaL_dostring(luaInstance, luaInputBuffer));
-		memset(luaInputBuffer, 0, 256);
-	}
+	auto stats = Hazel::Renderer2D::GetStats();
+	ImGui::DragFloat3("Pos", glm::value_ptr(m_SpritePos), 0.01f);
+	ImGui::DragFloat2("Size", glm::value_ptr(m_SpriteSize), 0.01f);
+
+	ImGui::Text("Renderer2D stats : ");
+	ImGui::Text("Draw calls : %d", stats.DrawCalls);
+	ImGui::Text("Quads : %d", stats.QuadCount);
+	ImGui::Text("Vertices : %d", stats.GetVertexCount());
+	ImGui::Text("Indices : %d", stats.GetIndexCount());
+	ImGui::ColorEdit4("Square Color", glm::value_ptr(m_SquareColor));
 	ImGui::End();
 }
 
-void Sandbox2D::OnEvent(Hazel::Event& e)
+void LuaLayer::OnEvent(Hazel::Event& e)
 {
 	m_CameraController.OnEvent(e);
 }

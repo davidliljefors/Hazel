@@ -6,8 +6,6 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="src\ImageTools.h" />
-    <ClInclude Include="src\LuaUtils.h" />
     <ClInclude Include="src\Sandbox2D.h" />
     <ClInclude Include="src\game\Collider.h">
       <Filter>game</Filter>
