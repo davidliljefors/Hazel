@@ -1,1 +1,0 @@
-{"otherData": {},"traceEvents":[{"cat":"function","dur":5957,"name":"void __cdecl Hazel::ImGuiLayer::OnDetach(void)","ph":"X","pid":0,"tid":10320099709738395948,"ts":321164069763},{"cat":"function","dur":6472,"name":"void __cdecl Hazel::WindowsWindow::Shutdown(void)","ph":"X","pid":0,"tid":10320099709738395948,"ts":321164075843}]}

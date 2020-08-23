@@ -19,6 +19,14 @@ namespace Hazel {
 		glViewport(x, y, width, height);
 	}
 
+	glm::vec4 OpenGLRendererAPI::GetViewport()
+	{
+		HZ_PROFILE_FUNCTION();
+		GLint viewport[4];
+		glGetIntegerv(GL_VIEWPORT, viewport);
+		return { viewport[0] , viewport[1] , viewport[2] , viewport[3] };
+	}
+
 	void OpenGLRendererAPI::SetClearColor(const glm::vec4& color)
 	{
 		HZ_PROFILE_FUNCTION();

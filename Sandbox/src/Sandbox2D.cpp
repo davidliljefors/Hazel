@@ -6,12 +6,12 @@
 
 Hazel::Ref<Hazel::Texture2D> logo;
 
-Sandbox2D::Sandbox2D()
+LuaLayer::LuaLayer()
 	: Layer("Sandbox2D"), m_CameraController(1280.f / 720.f)
 {
 }
 
-void Sandbox2D::OnAttach()
+void LuaLayer::OnAttach()
 {
 	HZ_PROFILE_FUNCTION();
 
@@ -20,11 +20,11 @@ void Sandbox2D::OnAttach()
 	logo = Hazel::Texture2D::Create("assets/HazelLogo.png");
 }
 
-void Sandbox2D::OnDetach()
+void LuaLayer::OnDetach()
 {
 }
 
-void Sandbox2D::OnUpdate(Hazel::Timestep ts)
+void LuaLayer::OnUpdate(Hazel::Timestep ts)
 {
 	static int framecount = 0;
 	HZ_PROFILE_FUNCTION();
@@ -58,7 +58,7 @@ void Sandbox2D::OnUpdate(Hazel::Timestep ts)
 		static float rot = 0;
 		rot += 50.f * ts;
 		Hazel::Renderer2D::DrawRotatedQuad({ -2.0f, -2.0f }, { 3.f, 3.f }, rot, logo);
-			
+
 	}
 	Hazel::Renderer2D::EndScene();
 
@@ -75,7 +75,7 @@ void Sandbox2D::OnUpdate(Hazel::Timestep ts)
 	Hazel::Renderer2D::EndScene();
 }
 
-void Sandbox2D::OnImGuiRender()
+void LuaLayer::OnImGuiRender()
 {
 	ImGui::Begin("Settings");
 
@@ -92,7 +92,7 @@ void Sandbox2D::OnImGuiRender()
 	ImGui::End();
 }
 
-void Sandbox2D::OnEvent(Hazel::Event& e)
+void LuaLayer::OnEvent(Hazel::Event& e)
 {
 	m_CameraController.OnEvent(e);
 }

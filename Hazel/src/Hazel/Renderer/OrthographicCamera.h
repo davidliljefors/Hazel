@@ -16,6 +16,8 @@ namespace Hazel {
 		float GetRotation() const { return m_Rotation; }
 		void SetRotation(float rotation) { m_Rotation = rotation; RecalculateViewMatrix(); }
 
+		glm::vec3 GetMouseWorldPosition(glm::vec2 mousepos);
+
 		const glm::mat4& GetProjectionMatrix() const { return m_ProjectionMatrix; }
 		const glm::mat4& GetViewMatrix() const { return m_ViewMatrix; }
 		const glm::mat4& GetViewProjectionMatrix() const { return m_ViewProjectionMatrix; }
@@ -28,6 +30,7 @@ namespace Hazel {
 		glm::mat4 m_ViewProjectionMatrix;
 
 		glm::vec3 m_Position = { 0.0f, 0.0f, 0.0f };
+		glm::vec4 m_Viewport{ -1.0f, -1.0f, 1.0f, 1.0f };
 		float m_Rotation = 0.0f;
 	};
 
