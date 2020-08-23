@@ -15,6 +15,8 @@
 char luaInputBuffer[256];
 
 lua_State* Sandbox2D::luaInstance = luaL_newstate();
+Hazel::Ref<Hazel::Texture2D> zero1 = nullptr;
+Hazel::Ref<Hazel::Texture2D> zero2 = nullptr;
 
 Sandbox2D::Sandbox2D()
 	: Layer("Sandbox2D"), m_CameraController(1280.f / 720.f)
@@ -24,14 +26,18 @@ Sandbox2D::Sandbox2D()
 	lua_pushlightuserdata(luaInstance, this);
 	lua_setglobal(luaInstance, "game");
 	lua_register(luaInstance, "destroyThing", wrap_DestroyThing);
+	lua_register(luaInstance, "createThing", wrap_CreateThing);
 	LuaUtils::CheckError(luaInstance, luaL_dofile(luaInstance, "behaviour.lua"));
 
-	m_Things.emplace_back(Hazel::Texture2D::Create("zerotwo.png"));
-	m_Things.emplace_back(Hazel::Texture2D::Create("zerotwo.png"));
-	m_Things.emplace_back(Hazel::Texture2D::Create("zerotwo.png"));
-	m_Things.emplace_back(Hazel::Texture2D::Create("zerotwo.png"));
-	m_Things.emplace_back(Hazel::Texture2D::Create("zerotwo.png"));
-	m_ControlledThing = std::make_unique<Thing>(Hazel::Texture2D::Create("zerotwo.png"));
+	zero1 = Hazel::Texture2D::Create("zerotwo.png");
+	zero2 = Hazel::Texture2D::Create("zerothree.png");
+
+	m_Things.emplace_back(zero1);
+	m_Things.emplace_back(zero1);
+	m_Things.emplace_back(zero1);
+	m_Things.emplace_back(zero1);
+	m_Things.emplace_back(zero1);
+	m_ControlledThing = std::make_unique<Thing>(zero2);
 }
 
 void Sandbox2D::OnAttach()
@@ -45,7 +51,7 @@ void Sandbox2D::OnDetach()
 }
 
 bool bPrssedLastFrame = false;
-float movespeed = 1.f;
+float movespeed = 14.f;
 
 void Sandbox2D::OnUpdate(Hazel::Timestep ts)
 {
@@ -102,9 +108,13 @@ void Sandbox2D::OnUpdate(Hazel::Timestep ts)
 	Hazel::RenderCommand::Clear();
 	Hazel::Renderer2D::BeginScene(m_CameraController.GetCamera());
 
-	for (const auto& thing : m_Things)
 	{
-		thing.Render();
+		HZ_PROFILE_SCOPE("Render loop");
+		for (const auto& thing : m_Things)
+		{
+			thing.Render();
+		}
+
 	}
 	if (m_ControlledThing) m_ControlledThing->Render();
 	Hazel::Renderer2D::EndScene();
@@ -113,6 +123,19 @@ void Sandbox2D::OnUpdate(Hazel::Timestep ts)
 	{
 		return thing.IsDead();
 	});
+
+	for (auto& t : m_ThingsToAdd)
+	{
+		m_Things.push_back(std::move(t));
+	}
+
+	m_ThingsToAdd.clear();
+}
+
+Thing* Sandbox2D::CreateThing(const char* textureName)
+{
+	auto thing = &m_ThingsToAdd.emplace_back(zero1);
+	return thing;
 }
 
 void Sandbox2D::OnImGuiRender()

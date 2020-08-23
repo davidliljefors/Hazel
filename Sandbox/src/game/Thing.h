@@ -24,10 +24,11 @@ struct Thing
 
 	inline bool Intersects(float xp, float yp)
 	{
-		return  (xp >= m_Pos.x && xp <= (m_Pos.x + 1.f) &&
-			yp >= m_Pos.y && yp <= (m_Pos.y + 1.f));
+		return  (xp >= m_Pos.x && xp <= (m_Pos.x + m_Size.x) &&
+			yp >= m_Pos.y && yp <= (m_Pos.y + m_Size.y));
 	}
 
+	// Simple AABB
 	inline bool Intersects(Thing* other)
 	{
 		if (
@@ -35,7 +36,6 @@ struct Thing
 			this->m_Pos.x + this->m_Size.x > other->m_Pos.x &&
 			this->m_Pos.y < other->m_Pos.y + other->m_Size.y &&
 			this->m_Pos.y + this->m_Size.y > other->m_Pos.y
-
 			)
 			return true;
 		return false;

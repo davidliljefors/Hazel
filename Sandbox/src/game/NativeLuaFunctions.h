@@ -3,13 +3,28 @@
 #include "lua.hpp"
 #include "Thing.h"
 
+// createThing(Sandbox2D* app, char* textureFilename, pos x, pos y)
+// returns c++ owned pointer to created thing
+int wrap_CreateThing(lua_State* L)
+{
+	if (lua_gettop(L) != 4) return -1;
+
+	Sandbox2D* app = static_cast<Sandbox2D*>(lua_touserdata(L, -4));
+	auto filepath = lua_tostring(L, -3);
+	auto x = lua_tonumber(L, -2);
+	auto y = lua_tonumber(L, -1);
+	auto thing = app->CreateThing(filepath);
+	thing->SetPos((float)x, (float)y);
+	return 0;
+}
+
+// destroyThing(Thing* thing)
 int wrap_DestroyThing(lua_State* L)
 {
 	if (lua_gettop(L) != 1) return -1;
-	{
-		Thing* thing = static_cast<Thing*>(lua_touserdata(L, -1));
-		thing->Kill();
-	}
+	
+	Thing* thing = static_cast<Thing*>(lua_touserdata(L, -1));
+	thing->Kill();
 	return 0;
 }
 
