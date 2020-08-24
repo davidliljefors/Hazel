@@ -19,7 +19,6 @@ void Sandbox2D::OnAttach()
 	HZ_PROFILE_FUNCTION();
 
 	m_CheckerTexture = Hazel::Texture2D::Create("assets/Checkerboard.png");
-	m_SpriteSheet = Hazel::Texture2D::Create("assets/rpg_spritesheet.png");
 	logo = Hazel::Texture2D::Create("assets/HazelLogo.png");
 }
 
@@ -34,6 +33,13 @@ void Sandbox2D::OnUpdate(Hazel::Timestep ts)
 	// Update
 	m_CameraController.OnUpdate(ts);
 
+	if (Hazel::Input::IsMouseButtonPressed(0))
+	{
+		std::stringstream ss;
+		auto [x, y] = Hazel::Input::GetMousePosition();
+		ss << "Mouse X:" << x << ", Y: " << y << std::endl;
+	}
+
 	// Render
 	Hazel::Renderer2D::ResetStats();
 
@@ -44,19 +50,15 @@ void Sandbox2D::OnUpdate(Hazel::Timestep ts)
 		Hazel::Renderer2D::BeginScene(m_CameraController.GetCamera());
 	}
 
-	{
-		HZ_PROFILE_SCOPE("Sandobx::Render Draw");
-		Hazel::Renderer2D::DrawQuad(m_SpritePos, m_SpriteSize, m_SpriteSheet);
-	}
 	Hazel::Renderer2D::EndScene();
 
 	Hazel::Renderer2D::BeginScene(m_CameraController.GetCamera());
-	for (float y = -5.f; y < 5.0f; y += 0.5f)
+	for (float y = -5.f; y < 5.0f; y +=1.0f)
 	{
-		for (float x = -5.f; x < 5.0f; x += 0.5f)
+		for (float x = -5.f; x < 5.0f; x += 1.0f)
 		{
 			glm::vec4 col = { (x + 5.f) / 10.f, (y + 5.f) / 10.f, 0.6f, 0.7f };
-			Hazel::Renderer2D::DrawQuad({ x, y, 1.0f }, glm::vec2(0.45f), col);
+			Hazel::Renderer2D::DrawQuad({ x, y, 1.0f }, glm::vec2(0.95f), col);
 		}
 	}
 
@@ -66,7 +68,7 @@ void Sandbox2D::OnUpdate(Hazel::Timestep ts)
 void Sandbox2D::OnImGuiRender()
 {
 	ImGui::Begin("Settings");
-	ImGui::Text("FPS : %f", 1.f/frametime);
+	ImGui::Text("FPS : %f", 1.f / frametime);
 
 	auto stats = Hazel::Renderer2D::GetStats();
 	ImGui::DragFloat3("Pos", glm::value_ptr(m_SpritePos), 0.01f);
@@ -75,8 +77,8 @@ void Sandbox2D::OnImGuiRender()
 	ImGui::Text("Renderer2D stats : ");
 	ImGui::Text("Draw calls : %d", stats.DrawCalls);
 	ImGui::Text("Quads : %d", stats.QuadCount);
-	ImGui::Text("Vertices : %d", stats.GetVertexCount());
-	ImGui::Text("Indices : %d", stats.GetIndexCount());
+	ImGui::Text("Vertices : %d", stats.GetTotalVertexCount());
+	ImGui::Text("Indices : %d", stats.GetTotalIndexCount());
 	ImGui::ColorEdit4("Square Color", glm::value_ptr(m_SquareColor));
 	ImGui::End();
 }

@@ -2,6 +2,7 @@
 #include "Hazel.h"
 #include "Hazel/Renderer/Texture.h"
 
+
 class Sandbox2D : public Hazel::Layer
 {
 public:
@@ -21,7 +22,7 @@ private:
 	Hazel::Ref<Hazel::VertexArray> m_SquareVA;
 	Hazel::Ref<Hazel::Shader> m_FlatColorShader;
 	Hazel::Ref<Hazel::Texture2D> m_CheckerTexture;
-	Hazel::Ref<Hazel::Texture2D> m_SpriteSheet;
+
 	glm::vec3 m_SpritePos {1.0f, 1.0f, 1.0f};
 	glm::vec2 m_SpriteSize {1.0f, 1.0f};
 

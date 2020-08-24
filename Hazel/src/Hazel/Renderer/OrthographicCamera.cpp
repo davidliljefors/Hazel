@@ -22,11 +22,13 @@ namespace Hazel {
 
 	glm::vec3 OrthographicCamera::GetMouseWorldPosition(glm::vec2 mousepos)
 	{
+		auto vp = RenderCommand::GetViewport();
+		
 		return glm::unProject(
-			{ mousepos.x, (720.f - mousepos.y), 0 },
+			{ mousepos.x, (vp.y - mousepos.y), 0 },
 			m_ViewMatrix, 
 			m_ProjectionMatrix, 
-			RenderCommand::GetViewport() 
+			vp
 		);
 	}
 

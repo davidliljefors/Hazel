@@ -13,20 +13,24 @@ namespace Hazel {
 	public:
 		OrthographicCameraController(float aspectRatio, bool rotation = false);
 
-		OrthographicCamera& GetCamera()				{ return m_Camera; }
-		const OrthographicCamera& GetCamera() const { return m_Camera; }
+		auto& GetCamera() { return m_Camera; }
+		const auto& GetCamera() const { return m_Camera; }
+
 		void SetZoomLevel(float zoom) { m_ZoomLevel = zoom; }
 		float GetZoomLevel() const { return m_ZoomLevel; }
+
 		glm::vec3 GetMouseWorldPosition(glm::vec2 mousepos) { return m_Camera.GetMouseWorldPosition(mousepos); }
 
 		void OnUpdate(Timestep ts);
 		void OnEvent(Event& e);
+
 	private:
 		bool OnMouseScrolled(MouseScrolledEvent& e);
 		bool OnWindowResized(WindowResizeEvent& e);
 
-		float m_AspectRatio { 1.0f };
-		float m_ZoomLevel { 1.0f };
+	private:
+		float m_AspectRatio = 1.0f ;
+		float m_ZoomLevel = 1.0f ;
 		bool m_Rotation;
 
 		glm::vec3 m_CameraPosition { 0.0f, 0.0f, 0.0f };
